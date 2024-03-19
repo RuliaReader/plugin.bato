@@ -1,4 +1,6 @@
-import { load, CheerioAPI } from 'cheerio'
+import $ from 'jquery'
+
+const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
 
 type MangaListFilterOptions = Array<{
   label: string,
@@ -34,10 +36,15 @@ async function handleMangaListSearch (page: number, keyword: string) {
 
     const rawStr = await window.Rulia.httpRequest({
       method: 'GET',
-      url: `https://mto.to/search?word=${encodeURIComponent(keyword)}&page=${page}`
+      url: `https://mto.to/search?word=${encodeURIComponent(keyword)}&page=${page}`,
+      headers: {
+        Cookie: 'fvt=1710871788; cf_clearance=c.OJYsmrGQB8.nTOvGTQz4mb3_IEJn6blKgedL7hcR8-1710871789-1.0.1.1-6nDbdoOy60oQocDFuyU0JdYJerYEf.DP0UwTebPywwvcWf7roin..XEFbZmXjBg0ycuI482suOnnpDYCAzn1KA',
+        'User-Agent': userAgent
+      }
     })
-    const $ = load(rawStr)
-    const $mangaList = $('#series-list').children('.item')
+
+    const $document = $(rawStr)
+    const $mangaList = $document.find('#series-list').children('.item')
     $mangaList.each((_, el) => {
       const $a = $(el).find('.item-title')
       const title = $a.text() || ''
@@ -61,14 +68,16 @@ async function handleMangaListSearch (page: number, keyword: string) {
  * Get manga list for manga list page.
  * This function will be invoked by Rulia in the manga list page.
  *
- * @param {string} page Page number. Please notice this arg will be passed from Rulia in string type.
- * @param {string} pageSize Page size. Please notice this arg will be passed from Rulia in string type.
+ * @param {string} rawPage Page number. Please notice this arg will be passed from Rulia in string type.
+ * @param {string} rawPageSize Page size. Please notice this arg will be passed from Rulia in string type.
  * @param {string} keyword The search keyword. It will empty when user doesn't provide it.
  * @param {string} rawFilterOptions The filter options.
  * @returns
  */
-async function getMangaList (rawPage: string, pageSize: string, keyword?: string, rawFilterOptions?: string) {
+async function getMangaList (rawPage: string, rawPageSize: string, keyword?: string, rawFilterOptions?: string) {
   const page = parseIntSafe(rawPage, 1)
+
+  window.Rulia.appToast(`Request page ${rawPage}, keyword: ${keyword}`)
 
   // If keyword is provided go for the search page.
   if (keyword) {
@@ -83,15 +92,21 @@ async function getMangaList (rawPage: string, pageSize: string, keyword?: string
     url = url + '?page=' + page
   }
 
+  window.Rulia.appToast(url)
+
   try {
     const rawStr = await window.Rulia.httpRequest({
       url,
-      method: 'GET'
+      method: 'GET',
+      headers: {
+        Cookie: 'fvt=1710871788; cf_clearance=c.OJYsmrGQB8.nTOvGTQz4mb3_IEJn6blKgedL7hcR8-1710871789-1.0.1.1-6nDbdoOy60oQocDFuyU0JdYJerYEf.DP0UwTebPywwvcWf7roin..XEFbZmXjBg0ycuI482suOnnpDYCAzn1KA',
+        'User-Agent': userAgent
+      }
     })
 
-    let $: CheerioAPI
+    let $document
     if (page <= 1) {
-      $ = load(rawStr)
+      $document = $($.parseHTML(rawStr))
     } else {
       const response = JSON.parse(rawStr) as {
         eno: number
@@ -101,14 +116,14 @@ async function getMangaList (rawPage: string, pageSize: string, keyword?: string
           more: boolean
         }
       }
-      $ = load(response.res.html)
+      $document = $($.parseHTML(response.res.html))
     }
 
     const result: IGetMangaListResult = {
       list: []
     }
 
-    const $mangaList = $('#series-list').children('.item')
+    const $mangaList = $document.find('#series-list').children('.item')
     $mangaList.each((_, el) => {
       const $a = $(el).find('.item-title')
       const title = $a.text() || ''
@@ -148,24 +163,28 @@ async function getMangaData (dataPageUrl: string) {
 
     const rawStr = await window.Rulia.httpRequest({
       method: 'GET',
-      url: dataPageUrl
+      url: dataPageUrl,
+      headers: {
+        Cookie: 'fvt=1710871788; cf_clearance=c.OJYsmrGQB8.nTOvGTQz4mb3_IEJn6blKgedL7hcR8-1710871789-1.0.1.1-6nDbdoOy60oQocDFuyU0JdYJerYEf.DP0UwTebPywwvcWf7roin..XEFbZmXjBg0ycuI482suOnnpDYCAzn1KA',
+        'User-Agent': userAgent
+      }
     })
 
-    const $ = load(rawStr)
+    const $document = $($.parseHTML(rawStr))
 
-    const $title = $('.item-title')
+    const $title = $document.find('.item-title')
     const titleText = $title.text() || ''
     result.title = titleText
 
-    const $desc = $('#limit-height-body-summary .limit-html')
+    const $desc = $document.find('#limit-height-body-summary .limit-html')
     const descText = $desc.text() || ''
     result.description = descText
 
-    const $coverImg = $('.attr-cover').children('img')
+    const $coverImg = $document.find('.attr-cover').children('img')
     const coverUrl = $coverImg.attr('src') || ''
     result.coverUrl = coverUrl
 
-    const $episodeList = $('.episode-list .main').children('.item')
+    const $episodeList = $document.find('.episode-list .main').children('.item')
     $episodeList.each((_, el) => {
       const $a = $(el).find('.chapt')
       const title = $a.text() || ''
@@ -193,14 +212,17 @@ async function getChapterImageList (chapterUrl: string) {
   try {
     const rawStr = await window.Rulia.httpRequest({
       method: 'GET',
-      url: chapterUrl
+      url: chapterUrl,
+      headers: {
+        Cookie: 'fvt=1710871788; cf_clearance=c.OJYsmrGQB8.nTOvGTQz4mb3_IEJn6blKgedL7hcR8-1710871789-1.0.1.1-6nDbdoOy60oQocDFuyU0JdYJerYEf.DP0UwTebPywwvcWf7roin..XEFbZmXjBg0ycuI482suOnnpDYCAzn1KA',
+        'User-Agent': userAgent
+      }
     })
-    const $ = load(rawStr)
+    const $document = $($.parseHTML(rawStr))
 
     // Find the longest (text) script element.
-    const $scripts = $('script')
     let scriptText = ''
-    $scripts.each((_, el) => {
+    $document.find('script').each((_, el) => {
       const text = $(el).text()
       if (text.length >= scriptText.length) {
         scriptText = text
