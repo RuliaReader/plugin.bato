@@ -1,0 +1,9 @@
+{
+  "name": "@rulia/bato",
+  "title": "Bato.to",
+  "description": "Bato manga plugin.",
+  "version": "<VERSION>",
+  "author": "LancerComet",
+  "tags": ["bato", "Manga"],
+  "homepage": "https://github.com/RuliaReader/plugin.bato"
+}
