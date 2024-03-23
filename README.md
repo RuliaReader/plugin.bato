@@ -1,6 +1,6 @@
 # Bato
 
-This is the plugin for bato.to.
+This is the plugin for bato.to. Still under construction.
 
 ## TODO
 
