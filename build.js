@@ -30,7 +30,7 @@ function deleteFolderRecursive (directory) {
 async function main () {
   // Step 1: Execute tsc
   try {
-    execSync('npm run build:lib')
+    execSync('rollup -c')
     console.log('Lib build completed.')
   } catch (error) {
     console.error(`Error during tsc: ${error}`)

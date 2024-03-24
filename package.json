@@ -1,18 +1,18 @@
 {
-  "name": "@rulia/plugin.bato",
+  "name": "@rulia/bato",
   "version": "0.1.0",
   "description": "Bato manga plugin.",
   "private": true,
   "scripts": {
-    "build:lib": "rollup -c",
-    "build": "npm run build:lib && node build.js"
+    "build": "node build.js"
   },
   "devDependencies": {
     "@lancercomet/eslint-config-eslint-rules": "^0.1.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@rulia/types": "^0.4.0",
+    "@rulia/types": "^0.5.0",
+    "@types/jquery": "^3.5.29",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
     "archiver": "^6.0.1",
@@ -27,6 +27,6 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12"
+    "jquery": "^3.7.1"
   }
 }

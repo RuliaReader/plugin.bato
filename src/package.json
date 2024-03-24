@@ -5,5 +5,6 @@
   "version": "<VERSION>",
   "author": "LancerComet",
   "tags": ["bato", "Manga"],
-  "homepage": "https://github.com/RuliaReader/plugin.bato"
+  "homepage": "https://github.com/RuliaReader/plugin.bato",
+  "requestedVersion": "0.18.0"
 }
