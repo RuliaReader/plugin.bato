@@ -77,8 +77,6 @@ async function handleMangaListSearch (page: number, keyword: string) {
 async function getMangaList (rawPage: string, rawPageSize: string, keyword?: string, rawFilterOptions?: string) {
   const page = parseIntSafe(rawPage, 1)
 
-  window.Rulia.log('info', `Request page ${rawPage}, keyword: ${keyword}`)
-
   // If keyword is provided go for the search page.
   if (keyword) {
     await handleMangaListSearch(page, keyword)
@@ -91,8 +89,6 @@ async function getMangaList (rawPage: string, rawPageSize: string, keyword?: str
   if (page > 1) {
     url = url + '?page=' + page
   }
-
-  window.Rulia.log('info', url)
 
   try {
     const rawStr = await window.Rulia.httpRequest({
@@ -138,7 +134,6 @@ async function getMangaList (rawPage: string, rawPageSize: string, keyword?: str
       })
     })
 
-    window.Rulia.log('info', `Found ${result.list.length} mangas`)
     window.Rulia.endWithResult(result)
   } catch (error) {
     window.Rulia.endWithException((error as Error).message)
@@ -196,11 +191,9 @@ async function getMangaData (dataPageUrl: string) {
         title,
         url
       }
-      window.Rulia.log('info', 'Found chapter: ' + JSON.stringify(item))
       result.chapterList.push(item)
     })
 
-    window.Rulia.log('info', 'getMangaData: ' + JSON.stringify(result.chapterList))
     window.Rulia.endWithResult(result)
   } catch (error) {
     window.Rulia.endWithException((error as Error).message)
@@ -214,8 +207,6 @@ async function getMangaData (dataPageUrl: string) {
  */
 async function getChapterImageList (chapterUrl: string) {
   // chapterUrl would be like: https://mto.to/chapter/1540671
-  window.Rulia.log('info', 'getChapterImageList: ' + chapterUrl)
-
   try {
     const rawStr = await window.Rulia.httpRequest({
       method: 'GET',
@@ -227,7 +218,6 @@ async function getChapterImageList (chapterUrl: string) {
     })
 
     const $scripts = $(rawStr).filter('script')
-    window.Rulia.log('info', 'Found ' + $scripts.length + ' script elements')
 
     // Find the longest (text) script element.
     let scriptText = ''
@@ -238,14 +228,11 @@ async function getChapterImageList (chapterUrl: string) {
       }
     })
 
-    window.Rulia.log('info', 'Found script text: ' + scriptText)
-
     // 'scriptText' is a piece of JavaScript script, it has a constant
     // named 'imgHttps' and we need to get it:
     // eslint-disable-next-line no-new-func
     const func = new Function(scriptText + ';return imgHttps;')
     const imgHttps = func() as string[]
-    window.Rulia.log('info', 'Found ' + imgHttps.length + ' images')
 
     const result: IRuliaChapterImage[] = imgHttps.map(url => ({
       url,
@@ -270,6 +257,5 @@ async function getChapterImageList (chapterUrl: string) {
  * @param {string} path This url is from the result of the function 'getChapterImageList'
  */
 async function getImageUrl (path: string) {
-  window.Rulia.log('info', 'getImageUrl: ' + path)
   window.Rulia.endWithResult(path)
 }
