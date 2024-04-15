@@ -6,5 +6,11 @@
   "author": "LancerComet",
   "tags": ["bato", "Manga"],
   "homepage": "https://github.com/RuliaReader/plugin.bato",
-  "requestedVersion": "0.17.0"
+  "requestedVersion": "0.17.0",
+  "userConfig": {
+    "langs": {
+      "displayName": "Languages",
+      "description": "You can specific the manga languages. The format is the form of \"zh,en,fr,ja\", which you can find in the end of the bato urls: https://mto.to/browse?langs=zh,en,fr,ja"
+    }
+  }
 }

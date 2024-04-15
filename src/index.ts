@@ -58,6 +58,18 @@ async function handleMangaListSearch (page: number, keyword: string) {
       })
     })
 
+    // Check it should return the empty list.
+    const $pagination = $document.find('.pagination.mb-0')
+      .last()
+      .children('.page-item.active')
+
+    if ($pagination) {
+      const _currentPage = parseIntSafe($pagination.text(), 1)
+      if (page > _currentPage) {
+        result.list = []
+      }
+    }
+
     window.Rulia.endWithResult(result)
   } catch (error) {
     window.Rulia.endWithException((error as Error).message)
@@ -91,6 +103,14 @@ async function getMangaList (rawPage: string, rawPageSize: string, keyword?: str
   }
 
   try {
+    const userConfig = window.Rulia.getUserConfig() ?? {}
+    const langs = userConfig.langs
+    if (langs) {
+      url += url.includes('?')
+        ? `&langs=${langs}`
+        : `?langs=${langs}`
+    }
+
     const rawStr = await window.Rulia.httpRequest({
       url,
       method: 'GET',
@@ -193,6 +213,9 @@ async function getMangaData (dataPageUrl: string) {
       }
       result.chapterList.push(item)
     })
+
+    // Reverse the chapter list.
+    result.chapterList.reverse()
 
     window.Rulia.endWithResult(result)
   } catch (error) {
