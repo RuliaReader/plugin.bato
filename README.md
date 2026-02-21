@@ -1,6 +1,10 @@
 # Bato
 
-This is the plugin for bato.to. Still under construction.
+## FYI
+
+Since bato is gone, this plugin is no more available.
+
+<del>This is the plugin for bato.to. Still under construction.</del>
 
 ## TODO
 
